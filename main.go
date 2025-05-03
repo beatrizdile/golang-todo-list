@@ -1,30 +1,34 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
+
+var shortGolang = "Watch Golang crash course"
+var fullGolang = "Watch Nana's Golang Full Course"
+var rewardDessert = "Reward myself with a cheesecake"
+
+var taskItems = []string{shortGolang, fullGolang, rewardDessert}
 
 func main() {
-	var shortGolang = "Watch Golang crash course"
-	var fullGolang = "Watch Nana's Golang Full Course"
-	var rewardDessert = "Reward myself with a cheesecake"
+	http.HandleFunc("/", helloUser)
+	http.HandleFunc("/show-tasks", showTasks)
 
-	var taskItems = []string{shortGolang, fullGolang, rewardDessert}
-
-	fmt.Println("##### Welcome to our Todolist App! #####")
-	printTasks(taskItems)
-	fmt.Println()
-
-	taskItems = addTask(taskItems, "Go for a run")
-	taskItems = addTask(taskItems, "Practicing coding in Go")
-
-	fmt.Println("Updated List")
-	printTasks(taskItems)
+	http.ListenAndServe(":8080", nil)
 }
 
-func printTasks(taskItems []string) {
+func showTasks(writer http.ResponseWriter, request *http.Request) {
 	fmt.Println("List of my Todos")
 	for index, task := range taskItems {
-		fmt.Printf("Task #%d: %s\n", index+1, task)
+		str := fmt.Sprintf("Task #%d: %s\n", index+1, task)
+		fmt.Fprintln(writer, str)
 	}
+}
+
+func helloUser(writer http.ResponseWriter, request *http.Request) {
+	var greeting = "##### Welcome to our Todolist App! #####"
+	fmt.Fprintln(writer, greeting)
 }
 
 func addTask(taskItems []string, newTask string) []string {
